@@ -1,0 +1,10 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h1>Listing {{ listing.list_title }}</h1>
+    <h2>Owner: {{ owner }}</h2>
+    <h2>Description: {{ description }}</h2>
+    <h2>Starting Bid = ${{ bid }}</h2>
+
+
+{% endblock %}
