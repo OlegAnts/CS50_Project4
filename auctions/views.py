@@ -8,7 +8,16 @@ from .models import User, Listing
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    return render(request, "auctions/index.html",{
+        "listings": Listing.objects.all(),
+        "listing": listing,
+        # "title": listing.list_title,
+        # "description": listing.list_description,
+        # "owner": listing.list_owner,
+        # "bid": listing.starting_bid,
+        # "category": listing.get_list_category_display(),
+        # "image": listing.list_image_URL
+    })
 
 
 def login_view(request):
@@ -71,4 +80,6 @@ def listing(request, list_title):
         "description": listing.list_description,
         "owner": listing.list_owner,
         "bid": listing.starting_bid,
+        "category": listing.get_list_category_display(),
+        "image": listing.list_image_URL
     })
