@@ -3,6 +3,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib import messages
 
 from .models import User, Listing
 
@@ -83,3 +84,20 @@ def listing(request, list_title):
         "category": listing.get_list_category_display(),
         "image": listing.list_image_URL
     })
+
+
+def create(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        bid = request.POST.get("bid")
+        category = request.POST.get("category")
+        image = request.POST.get("image")
+
+        user = request.user
+
+        new_listing = Listing(list_title=title, list_description=description, list_category=category,
+                              starting_bid=bid, list_image_URL=image, list_owner=user)
+
+        new_listing.save()
+    return render(request, "auctions/create_listing.html")

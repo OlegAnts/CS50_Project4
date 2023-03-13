@@ -9,7 +9,7 @@
 
 
         <a href="{% url 'listing' listing.list_title %}">
-            <img src="{{ listing.list_image_URL }}"><br>
+            <img src="{{ listing.list_image_URL }}" height="300" width="300"><br>
             <h2>{{ listing.list_title }}</h2></a>
         <h4>Owner: {{ listing.list_owner }}</h4>
         <h4>Description: {{ listing.list_description }}</h4>
