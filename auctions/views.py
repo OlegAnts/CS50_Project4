@@ -1,11 +1,12 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib import messages
 
-from .models import User, Listing
+from .models import User, Listing, UserListingRelation, Watchlist
 
 
 def index(request):
@@ -72,6 +73,33 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
+
+@login_required()
+def watchlist(request):
+    user = request.user
+    listings = user.watchlist.all()
+
+    return render(request, "auctions/watchlist.html", {
+        "listings": listings,
+        "listing": listing,
+    })
+
+
+def add_to_watchlist(request, list_title):
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=list_title)
+        Watchlist(user=request.user, listing=listing, in_watchlist=True).save()
+
+
+    return render(request, "auctions/listing.html", {
+        "listing": listing,
+        "title": listing.list_title,
+        "description": listing.list_description,
+        "owner": listing.list_owner,
+        "bid": listing.starting_bid,
+        "category": listing.get_list_category_display(),
+        "image": listing.list_image_URL
+    })
 
 def listing(request, list_title):
     listing = Listing.objects.get(pk=list_title)

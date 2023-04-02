@@ -7,6 +7,11 @@
     <h2>Starting Bid = ${{ bid }}</h2>
     <h2>Category: {{ category }}</h2>
     <img src="{{ image }}" height="300" width="300">
+    <form id="watchlist">
+        {% csrf_token %}
+        <input type="submit" value="Add to watchlist" formaction="{% url 'add_to_watchlist' listing.list_title %}"
+               formmethod="post"><br>
+    </form>
 
 
 {% endblock %}
