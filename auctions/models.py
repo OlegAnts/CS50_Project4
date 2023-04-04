@@ -44,6 +44,7 @@ class UserListingRelation(models.Model):
 class Watchlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="user_watchlist")
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, null=True, related_name="watchlist_listing")
+
     in_watchlist = models.BooleanField(default=False)
 
 # class Comment(models.Model):

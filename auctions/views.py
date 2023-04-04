@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
 
@@ -88,18 +88,36 @@ def watchlist(request):
 def add_to_watchlist(request, list_title):
     if request.method == "POST":
         listing = Listing.objects.get(pk=list_title)
-        Watchlist(user=request.user, listing=listing, in_watchlist=True).save()
+        user = request.user
+        if not user.user_watchlist.filter(listing=list_title):
+            Watchlist(user=request.user, listing=listing, in_watchlist=True).save()
+            return HttpResponseRedirect(reverse("listing", kwargs={"list_title": list_title}))
+        else:
+            print("Already Exist")
 
 
-    return render(request, "auctions/listing.html", {
-        "listing": listing,
-        "title": listing.list_title,
-        "description": listing.list_description,
-        "owner": listing.list_owner,
-        "bid": listing.starting_bid,
-        "category": listing.get_list_category_display(),
-        "image": listing.list_image_URL
+
+
+def remove_from_watchlist(request, list_title):
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=list_title)
+        user = request.user
+        db_exist = user.user_watchlist.filter(listing=list_title)
+        if db_exist:
+            db_exist.delete()
+        else:
+            print("Not in Watchlist")
+
+        return render(request, "auctions/listing.html", {
+            "listing": listing,
+            "title": listing.list_title,
+            "description": listing.list_description,
+            "owner": listing.list_owner,
+            "bid": listing.starting_bid,
+            "category": listing.get_list_category_display(),
+            "image": listing.list_image_URL
     })
+
 
 def listing(request, list_title):
     listing = Listing.objects.get(pk=list_title)

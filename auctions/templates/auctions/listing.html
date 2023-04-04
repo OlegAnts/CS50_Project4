@@ -11,6 +11,8 @@
         {% csrf_token %}
         <input type="submit" value="Add to watchlist" formaction="{% url 'add_to_watchlist' listing.list_title %}"
                formmethod="post"><br>
+        <input type="submit" value="Remove from watchlist" formaction="{% url 'remove_from_watchlist' listing.list_title %}"
+               formmethod="post"><br>
     </form>
 
 
