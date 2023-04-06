@@ -85,6 +85,7 @@ def watchlist(request):
     })
 
 
+@login_required()
 def add_to_watchlist(request, list_title):
     if request.method == "POST":
         listing = Listing.objects.get(pk=list_title)
@@ -96,8 +97,7 @@ def add_to_watchlist(request, list_title):
             print("Already Exist")
 
 
-
-
+@login_required()
 def remove_from_watchlist(request, list_title):
     if request.method == "POST":
         listing = Listing.objects.get(pk=list_title)
@@ -107,20 +107,18 @@ def remove_from_watchlist(request, list_title):
             db_exist.delete()
         else:
             print("Not in Watchlist")
-
-        return render(request, "auctions/listing.html", {
-            "listing": listing,
-            "title": listing.list_title,
-            "description": listing.list_description,
-            "owner": listing.list_owner,
-            "bid": listing.starting_bid,
-            "category": listing.get_list_category_display(),
-            "image": listing.list_image_URL
-    })
+    return HttpResponseRedirect(reverse("listing", kwargs={"list_title": list_title}))
 
 
 def listing(request, list_title):
     listing = Listing.objects.get(pk=list_title)
+    watchlist_status = ''
+    if request.user.is_authenticated:
+        watchlist = request.user.user_watchlist.filter(listing=list_title)
+        if watchlist:
+            watchlist_status = "Product in your Watchlist"
+        else:
+            watchlist_status = "Product not in Watchlist"
     return render(request, "auctions/listing.html", {
         "listing": listing,
         "title": listing.list_title,
@@ -128,7 +126,8 @@ def listing(request, list_title):
         "owner": listing.list_owner,
         "bid": listing.starting_bid,
         "category": listing.get_list_category_display(),
-        "image": listing.list_image_URL
+        "image": listing.list_image_URL,
+        'watchlist': watchlist_status
     })
 
 

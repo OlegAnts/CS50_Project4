@@ -7,13 +7,26 @@
     <h2>Starting Bid = ${{ bid }}</h2>
     <h2>Category: {{ category }}</h2>
     <img src="{{ image }}" height="300" width="300">
-    <form id="watchlist">
+    <h2>{{ watchlist }}</h2>
+    <div>
+        {% if user.is_authenticated %}
+        <form id="watchlist">
         {% csrf_token %}
         <input type="submit" value="Add to watchlist" formaction="{% url 'add_to_watchlist' listing.list_title %}"
                formmethod="post"><br>
         <input type="submit" value="Remove from watchlist" formaction="{% url 'remove_from_watchlist' listing.list_title %}"
                formmethod="post"><br>
-    </form>
+        </form>
+        <form id="bid">
+            {% csrf_token %}
+            <input type="number" value="bid">
+            <input type="submit" value="bid" formmethod="post">
+        </form>
+        {% else %}
+            Not signed in.
+        {% endif %}
+    </div>
+
 
 
 {% endblock %}
