@@ -113,6 +113,8 @@ def remove_from_watchlist(request, list_title):
 def listing(request, list_title):
     listing = Listing.objects.get(pk=list_title)
     watchlist_status = ''
+    user = request.user
+    owner = Listing.objects.get(list_title=list_title).list_owner
     try:
         current_bid = UserListingRelation.objects.filter(listing=list_title).order_by("-bid_price")[0].bid_price
         current_bid_buyer = UserListingRelation.objects.filter(listing=list_title).order_by("-bid_price")[0].user
@@ -179,4 +181,16 @@ def make_bid(request, list_title):
                 messages.success(request, 'Your Bid is success')
         else:
             messages.error(request, 'Your bid mast be more then current bid!')
+    return HttpResponseRedirect(reverse("listing", kwargs={"list_title": list_title}))
+
+
+def close_listing(request, list_title):
+    # добавить закрытие листинга и закрыть возможность повторной покупки
+    current_bid = current_bid = UserListingRelation.objects.filter(listing=list_title).order_by("-bid_price")[0]
+    winner = current_bid.user
+    listing = Listing.objects.get(list_title=list_title)
+    listing.list_winner = winner
+    listing.save()
+
+
     return HttpResponseRedirect(reverse("listing", kwargs={"list_title": list_title}))

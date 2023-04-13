@@ -40,6 +40,14 @@
             Not signed in.
         {% endif %}
     </div>
+<br>
+    <div>
+        {% if user == owner %}
+            <form>
+                <input type="submit" value="Close Listing" formaction="{% url 'close_listing' listing.list_title %}">
+            </form>
+        {% endif %}
+    </div>
 
 
 
