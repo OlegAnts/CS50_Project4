@@ -113,6 +113,13 @@ def remove_from_watchlist(request, list_title):
 def listing(request, list_title):
     listing = Listing.objects.get(pk=list_title)
     watchlist_status = ''
+    try:
+        current_bid = UserListingRelation.objects.filter(listing=list_title).order_by("-bid_price")[0].bid_price
+        current_bid_buyer = UserListingRelation.objects.filter(listing=list_title).order_by("-bid_price")[0].user
+    except Exception:
+        current_bid = listing.starting_bid
+        current_bid_buyer = listing.list_owner
+
     if request.user.is_authenticated:
         watchlist = request.user.user_watchlist.filter(listing=list_title)
         if watchlist:
@@ -127,7 +134,9 @@ def listing(request, list_title):
         "bid": listing.starting_bid,
         "category": listing.get_list_category_display(),
         "image": listing.list_image_URL,
-        'watchlist': watchlist_status
+        'watchlist': watchlist_status,
+        'current_bid': current_bid,
+        'current_bid_buyer': current_bid_buyer
     })
 
 
@@ -146,3 +155,28 @@ def create(request):
 
         new_listing.save()
     return render(request, "auctions/create_listing.html")
+
+
+def make_bid(request, list_title):
+    if request.method == "POST":
+        user = request.user
+        listing = Listing.objects.get(list_title=list_title)
+        try:
+            current_bid = UserListingRelation.objects.filter(listing=list_title).order_by("-bid_price")[0].bid_price
+        except Exception:
+            current_bid = listing.starting_bid
+        bid = request.POST['new_bid']
+
+        if float(bid) > current_bid:
+            try:
+                user_last_bid = UserListingRelation.objects.get(user=user, listing=listing)
+                user_last_bid.bid_price = float(bid)
+                user_last_bid.save()
+            except Exception:
+                new_bid = UserListingRelation(user=user, listing=listing, bid_price=bid)
+                new_bid.save()
+            finally:
+                messages.success(request, 'Your Bid is success')
+        else:
+            messages.error(request, 'Your bid mast be more then current bid!')
+    return HttpResponseRedirect(reverse("listing", kwargs={"list_title": list_title}))

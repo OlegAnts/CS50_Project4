@@ -1,6 +1,7 @@
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Max
 
 
 
@@ -26,6 +27,7 @@ class Listing(models.Model):
 
     list_owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="my_listings")
     list_buyers = models.ManyToManyField(User, through="UserListingRelation", related_name="lots")
+    list_winner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     watchlist = models.ManyToManyField(User, through="Watchlist", related_name="watchlist")
 
     def __str__(self):

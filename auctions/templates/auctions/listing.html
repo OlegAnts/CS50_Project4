@@ -16,11 +16,25 @@
                formmethod="post"><br>
         <input type="submit" value="Remove from watchlist" formaction="{% url 'remove_from_watchlist' listing.list_title %}"
                formmethod="post"><br>
+
+        {% if messages %}
+        <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">
+                {{ message|safe }}
+                <a href="#" class="close">✖</a>
+            </li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+
+            <h2>Current_bid = {{ current_bid }} $ by {{ current_bid_buyer }}</h2>
         </form>
-        <form id="bid">
+        <form>
             {% csrf_token %}
-            <input type="number" value="bid">
-            <input type="submit" value="bid" formmethod="post">
+            <input type="number" name="new_bid">
+            <input type="submit" value="new_bid" formaction="{% url 'make_bid' listing.list_title %}"
+                   formmethod="post">
         </form>
         {% else %}
             Not signed in.
