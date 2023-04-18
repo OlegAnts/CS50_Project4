@@ -8,7 +8,8 @@
     <h2>Category: {{ category }}</h2>
     <img src="{{ image }}" height="300" width="300">
     <h2>{{ watchlist }}</h2>
-    <div>
+
+
         {% if user.is_authenticated %}
         <form id="watchlist">
         {% csrf_token %}
@@ -28,26 +29,34 @@
             </ul>
             {% endif %}
 
-            <h2>Current_bid = {{ current_bid }} $ by {{ current_bid_buyer }}</h2>
+
         </form>
+        {% if listing_status == "Open"%}
         <form>
+            <h2>Current_bid = {{ current_bid }} $ by {{ current_bid_buyer }}</h2>
             {% csrf_token %}
             <input type="number" name="new_bid">
             <input type="submit" value="new_bid" formaction="{% url 'make_bid' listing.list_title %}"
                    formmethod="post">
         </form>
-        {% else %}
-            Not signed in.
-        {% endif %}
-    </div>
-<br>
-    <div>
+        <br>
+        <div>
         {% if user == owner %}
             <form>
                 <input type="submit" value="Close Listing" formaction="{% url 'close_listing' listing.list_title %}">
             </form>
         {% endif %}
-    </div>
+        </div>
+        {% else %}
+            <h1>Listing Closed</h1>
+            <h1>Listing Winner {{ listing_winner }}</h1>
+        {% endif %}
+    {% else %}
+        Not signed in.
+    {% endif %}
+
+
+
 
 
 

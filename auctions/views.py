@@ -115,6 +115,8 @@ def listing(request, list_title):
     watchlist_status = ''
     user = request.user
     owner = Listing.objects.get(list_title=list_title).list_owner
+    list_status = "Open" if listing.list_winner is None else "Cloased"
+
     try:
         current_bid = UserListingRelation.objects.filter(listing=list_title).order_by("-bid_price")[0].bid_price
         current_bid_buyer = UserListingRelation.objects.filter(listing=list_title).order_by("-bid_price")[0].user
@@ -136,9 +138,11 @@ def listing(request, list_title):
         "bid": listing.starting_bid,
         "category": listing.get_list_category_display(),
         "image": listing.list_image_URL,
+        "listing_status": list_status,
         'watchlist': watchlist_status,
         'current_bid': current_bid,
-        'current_bid_buyer': current_bid_buyer
+        'current_bid_buyer': current_bid_buyer,
+        'listing_winner': listing.list_winner
     })
 
 
@@ -185,7 +189,6 @@ def make_bid(request, list_title):
 
 
 def close_listing(request, list_title):
-    # добавить закрытие листинга и закрыть возможность повторной покупки
     current_bid = current_bid = UserListingRelation.objects.filter(listing=list_title).order_by("-bid_price")[0]
     winner = current_bid.user
     listing = Listing.objects.get(list_title=list_title)
