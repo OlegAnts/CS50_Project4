@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
 
-from .models import User, Listing, UserListingRelation, Watchlist
+from .models import User, Listing, UserListingRelation, Watchlist, Comment
 
 
 def index(request):
@@ -110,12 +110,27 @@ def remove_from_watchlist(request, list_title):
     return HttpResponseRedirect(reverse("listing", kwargs={"list_title": list_title}))
 
 
+def make_comment(request, list_title):
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=list_title)
+        user = request.user
+        comment_text = request.POST.get('comment_text')
+        new_comment = Comment(user=user, listing=listing, comment_text=comment_text)
+        new_comment.save()
+        return HttpResponseRedirect(reverse("listing", kwargs={"list_title": list_title}))
+
+
+
 def listing(request, list_title):
     listing = Listing.objects.get(pk=list_title)
     watchlist_status = ''
     user = request.user
     owner = Listing.objects.get(list_title=list_title).list_owner
     list_status = "Open" if listing.list_winner is None else "Cloased"
+    comments = Comment.objects.filter(listing=listing)
+    # list_comments = []
+    # for comment in comments:
+    #     list_comments.append(comment.comment_text)
 
     try:
         current_bid = UserListingRelation.objects.filter(listing=list_title).order_by("-bid_price")[0].bid_price
@@ -142,7 +157,8 @@ def listing(request, list_title):
         'watchlist': watchlist_status,
         'current_bid': current_bid,
         'current_bid_buyer': current_bid_buyer,
-        'listing_winner': listing.list_winner
+        'listing_winner': listing.list_winner,
+        'comments': comments
     })
 
 
@@ -189,7 +205,7 @@ def make_bid(request, list_title):
 
 
 def close_listing(request, list_title):
-    current_bid = current_bid = UserListingRelation.objects.filter(listing=list_title).order_by("-bid_price")[0]
+    current_bid = UserListingRelation.objects.filter(listing=list_title).order_by("-bid_price")[0]
     winner = current_bid.user
     listing = Listing.objects.get(list_title=list_title)
     listing.list_winner = winner

@@ -49,5 +49,11 @@ class Watchlist(models.Model):
 
     in_watchlist = models.BooleanField(default=False)
 
-# class Comment(models.Model):
-#     pass
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, null=True)
+    comment_text = models.TextField(max_length=150, null=True)
+
+    def __str__(self):
+        return f"{self.user.username} to {self.listing.list_title}"
