@@ -128,9 +128,6 @@ def listing(request, list_title):
     owner = Listing.objects.get(list_title=list_title).list_owner
     list_status = "Open" if listing.list_winner is None else "Cloased"
     comments = Comment.objects.filter(listing=listing)
-    # list_comments = []
-    # for comment in comments:
-    #     list_comments.append(comment.comment_text)
 
     try:
         current_bid = UserListingRelation.objects.filter(listing=list_title).order_by("-bid_price")[0].bid_price
@@ -213,3 +210,24 @@ def close_listing(request, list_title):
 
 
     return HttpResponseRedirect(reverse("listing", kwargs={"list_title": list_title}))
+
+
+def categories(request):
+    categories = Listing.CATEGORIES
+    categories_list = [category[1] for category in categories]
+    return render(request, "auctions/categories.html", {
+        "categories": categories_list})
+
+def category(request, category):
+    categories = Listing.CATEGORIES
+    abbreviation_category = ''
+    for cat in categories:
+        if category == cat[1]:
+            abbreviation_category = cat[0]
+
+    return render(request, "auctions/category.html", {
+        "listings": Listing.objects.filter(list_category=abbreviation_category),
+        "listing": listing,
+        "category": category,
+    })
+
